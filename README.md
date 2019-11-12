@@ -128,10 +128,21 @@ public static void mergeSort(int[] A, int p, int r) {
 ```
 为避免在每个基本步骤必须检查是否有子数组为空，在每个子数组的末尾都放置了一张**哨兵**牌，它包含一个特殊的值，用于简化代码。当两个子数组都出现哨兵值的时候，说明所有非哨兵牌都已经被放置到输出数组中了。
 
-### LeetCode 241（from grandyang）
+### LeetCode 241 Different Ways to Add Parentheses（from grandyang）
 先建立一个结果 res 数组，然后遍历 input 中的字符，根据上面的分析，我们希望在每个运算符的地方，将 input 分成左右两部分，从而扔到递归中去计算，从而可
 以得到两个整型数组 left 和 right，分别表示作用两部分各自添加不同的括号所能得到的所有不同的值，此时我们只要分别从两个数组中取数字进行当前的运算符计
 算，然后把结果存到 res 中即可。当然，若最终结果 res 中还是空的，那么只有一种情况，input 本身就是一个数字，直接转为整型存入结果 res 中即可
+```
+Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
+
+Example 1:
+
+Input: "2-1-1"
+Output: [0, 2]
+Explanation: 
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+```
 ```
 public List<Integer> diffWaysToCompute(String input) {
     List<Integer> ret = new ArrayList<>();
