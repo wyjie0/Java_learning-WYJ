@@ -3,9 +3,9 @@
 ## 分治策略
 
 在分治策略中，要递归的解决一个问题，在每层递归中应用如下三个步骤：
-1. 分解：将问题划分为一些子问题，子问题的形式与原问题一样，只是规模更小
-2. 解决：递归地求解出子问题，如果子问题的规模足够小，则停止递归，直接求解
-3. 合并：将子问题的解组合成原问题的解
+1. 分解：将问题划分为一些子问题，子问题的形式与原问题一样，只是规模更小（从中分解还是从头开始分解）
+2. 解决：递归地求解出子问题，如果子问题的规模足够小，则停止递归，直接求解（如何定义最小子问题）
+3. 合并：将子问题的解组合成原问题的解（如何合并）
 求解问题需要找出基线条件和递归条件。
 
 ### 最大子数组问题（如LeetCode 121. Best Time to Buy and Sell Stock）
@@ -128,3 +128,98 @@ public static void mergeSort(int[] A, int p, int r) {
 ```
 为避免在每个基本步骤必须检查是否有子数组为空，在每个子数组的末尾都放置了一张**哨兵**牌，它包含一个特殊的值，用于简化代码。当两个子数组都出现哨兵值的时候，说明所有非哨兵牌都已经被放置到输出数组中了。
 
+### LeetCode 241（from grandyang）
+先建立一个结果 res 数组，然后遍历 input 中的字符，根据上面的分析，我们希望在每个运算符的地方，将 input 分成左右两部分，从而扔到递归中去计算，从而可
+以得到两个整型数组 left 和 right，分别表示作用两部分各自添加不同的括号所能得到的所有不同的值，此时我们只要分别从两个数组中取数字进行当前的运算符计
+算，然后把结果存到 res 中即可。当然，若最终结果 res 中还是空的，那么只有一种情况，input 本身就是一个数字，直接转为整型存入结果 res 中即可
+```
+public List<Integer> diffWaysToCompute(String input) {
+    List<Integer> ret = new ArrayList<>();
+    for (int i = 0; i < input.length(); i++) {
+        char op = input.charAt(i);
+        if (!(op >= '0' && op <= '9')) {
+            List<Integer> left = diffWaysToCompute(input.substring(0, i));
+            List<Integer> right = diffWaysToCompute(input.substring(i + 1));
+            for (int l : left) {
+                for (int r : right) {
+                    if (op == '+') ret.add(l + r);
+                    if (op == '-') ret.add(l - r);
+                    if (op == '*') ret.add(l * r);
+                }
+            }
+        }
+    }
+    if (ret.size() == 0) ret.add(Integer.valueOf(input));
+    return ret;
+}
+
+//使用hashmap减少重复计算
+private static Map<String, List<Integer>> map = new HashMap<>();
+public static List<Integer> diffWaysToCompute(String input) {
+    if (map.containsKey(input)) return map.get(input);
+    List<Integer> ret = new ArrayList<>();
+    for (int i = 0; i < input.length(); i++) {
+        char op = input.charAt(i);
+        if (!(op >= '0' && op <= '9')) {
+            List<Integer> left = diffWaysToCompute(input.substring(0, i));
+            List<Integer> right = diffWaysToCompute(input.substring(i + 1));
+            for (int l : left) {
+                for (int r : right) {
+                    if (op == '+') ret.add(l + r);
+                    if (op == '-') ret.add(l - r);
+                    if (op == '*') ret.add(l * r);
+                }
+            }
+        }
+    }
+    if (ret.size() == 0) ret.add(Integer.valueOf(input));
+    map.put(input, ret);
+    return ret;
+}
+```
+
+### 求两个有序数组中的中位数 LeetCode 4（from grandyang）
+
+这道题让我们求两个有序数组的中位数，而且限制了时间复杂度为 O(log (m+n))，看到这个时间复杂度，自然而然的想到了应该使用二分查找法来求解。但是这道题被
+定义为 Hard 也是有其原因的，难就难在要在两个未合并的有序数组之间使用二分法，如果这道题只有一个有序数组，让求中位数的话，估计就是个 Easy 题。对于这道
+题来说，可以将两个有序数组混合起来成为一个有序数组再做吗，图样图森破，这个时间复杂度限制的就是告诉你金坷垃别想啦。还是要用二分法，而且是在两个数组之间
+使用，感觉很高端啊。回顾一下中位数的定义，如果某个有序数组长度是奇数，那么其中位数就是最中间那个，如果是偶数，那么就是最中间两个数字的平均值。这里对于
+两个有序数组也是一样的，假设两个有序数组的长度分别为m和n，由于两个数组长度之和 m+n 的奇偶不确定，因此需要分情况来讨论，对于奇数的情况，直接找到最中间
+的数即可，偶数的话需要求最中间两个数的平均值。为了简化代码，不分情况讨论，使用一个小 trick，分别找第 (m+n+1) / 2 个，和 (m+n+2) / 2 个，然后求其平
+均值即可，这对奇偶数均适用。若 m+n 为奇数的话，那么其实 (m+n+1) / 2 和 (m+n+2) / 2 的值相等，相当于两个相同的数字相加再除以2，还是其本身。
+
+好，这里需要定义一个函数来在两个有序数组中找到第K个元素，下面重点来看如何实现找到第K个元素。首先，为了避免拷贝产生新的数组从而增加时间复杂度，使用两
+个变量i和j分别来标记数组 nums1 和 nums2 的起始位置。然后来处理一些 corner cases，比如当某一个数组的起始位置大于等于其数组长度时，说明其所有数字均已
+经被淘汰了，相当于一个空数组了，那么实际上就变成了在另一个数组中找数字，直接就可以找出来了。还有就是如果 K=1 的话，只要比较 nums1 和 nums2 的起始位
+置i和j上的数字就可以了。难点就在于一般的情况怎么处理？因为需要在两个有序数组中找到第K个元素，为了加快搜索的速度，可以使用二分法，那么对谁二分呢，数组
+么？其实要对K二分，意思是需要分别在 nums1 和 nums2 中查找第 K/2 个元素，注意这里由于两个数组的长度不定，所以有可能某个数组没有第 K/2 个数字，所以需
+要先 check 一下，数组中到底存不存在第 K/2 个数字，如果存在就取出来，否则就赋值上一个整型最大值（目的是要在 nums1 或者 nums2 中先淘汰 K/2 个较小的
+数字，判断的依据就是看 midVal1 和 midVal2 谁更小，但如果某个数组的个数都不到 K/2 个，自然无法淘汰，所以将其对应的 midVal 值设为整型最大值，以保证
+其不会被淘汰），若某个数组没有第 K/2 个数字，则淘汰另一个数组的前 K/2 个数字即可。举个例子来说吧，比如 nums1 = {3}，nums2 = {2, 4, 5, 6, 7}，
+K=4，要找两个数组混合中第4个数字，则分别在 nums1 和 nums2 中找第2个数字，而 nums1 中只有一个数字，不存在第二个数字，则 nums2 中的前2个数字可以直接
+跳过，为啥呢，因为要求的是整个混合数组的第4个数字，不管 nums1 中的那个数字是大是小，第4个数字绝不会出现在 nums2 的前两个数字中，所以可以直接跳过。
+
+有没有可能两个数组都不存在第 K/2 个数字呢，这道题里是不可能的，因为K不是任意给的，而是给的 m+n 的中间值，所以必定至少会有一个数组是存在第 K/2 个数字
+的。最后就是二分法的核心啦，比较这两个数组的第 K/2 小的数字 midVal1 和 midVal2 的大小，如果第一个数组的第 K/2 个数字小的话，那么说明要找的数字肯定
+不在 nums1 中的前 K/2 个数字，可以将其淘汰，将 nums1 的起始位置向后移动 K/2 个，并且此时的K也自减去 K/2，调用递归，举个例子来说吧，比如 nums1 = 
+{1, 3}，nums2 = {2, 4, 5}，K=4，要找两个数组混合中第4个数字，那么分别在 nums1 和 nums2 中找第2个数字，nums1 中的第2个数字是3，nums2 中的第2个数
+字是4，由于3小于4，所以混合数组中第4个数字肯定在 nums2 中，可以将 nums1 的起始位置向后移动 K/2 个。反之，淘汰 nums2 中的前 K/2 个数字，并将 nums2 
+的起始位置向后移动 K/2 个，并且此时的K也自减去 K/2，调用递归即可，参见代码如下：
+
+```
+public static double findMedianSortedArrays_DC(int[] nums1, int[] nums2) {
+    int m = nums1.length, n = nums2.length;
+    int left = (m + n + 1) / 2, right = (m + n + 2) / 2;
+    return (findKth(nums1, 0, nums2, 0, left) + findKth(nums1, 0, nums2, 0, right)) / 2.0;
+}
+//寻找两个数组合并后的第k个数
+public static int findKth(int[] nums1, int i, int[] nums2, int j, int k) {
+    if (i >= nums1.length) return nums2[j + k - 1];
+    if (j >= nums2.length) return nums1[i + k - 1];
+    if (k == 1) return Math.min(nums1[i], nums2[j]);
+    int midVal1 = (i + k / 2 - 1 < nums1.length) ? nums1[i + k / 2 - 1] : Integer.MAX_VALUE;
+    int midVal2 = (j + k / 2 - 1 < nums2.length) ? nums2[j + k / 2 - 1] : Integer.MAX_VALUE;
+    if (midVal1 < midVal2) return findKth(nums1, i + k / 2, nums2, j, k - k / 2);
+    else return findKth(nums1, i, nums2, j + k / 2, k - k / 2);
+}
+```
