@@ -21,11 +21,11 @@ public static void quickSort(int[] A, int p, int r) {
     }
 }
 ```
-为了排序一个数组A的全部元素，起始调用是partion(A, 0, A.length - 1)
+为了排序一个数组A的全部元素，起始调用是partition(A, 0, A.length - 1)
 ##### 数组的划分
 算法的关键部分就在于对数组的划分，它实现了对子数组A[p..r]的原址重排
 ```
-public static int partion(int[] A, int p, int r) {
+public static int partition(int[] A, int p, int r) {
     int pivot = A[r];
     int i = p - 1;
     //0--i的数都为小于pivot的数，i+1--r的数都为大于pivot的数
@@ -44,3 +44,5 @@ public static int partion(int[] A, int p, int r) {
     return i + 1;
 }
 ```
+在一个样例数组上的partition操作过程：
+<img src="https://github.com/wyjie0/Algorithm/blob/master/img/quickSort.png">
