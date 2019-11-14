@@ -4,3 +4,4 @@
 ## [分治策略](https://github.com/wyjie0/Algorithm/issues/1)
 ## 排序算法（堆排序和快速排序）
 ### [堆排序](https://github.com/wyjie0/Algorithm/issues/6)
+### [快速排序](https://github.com/wyjie0/Algorithm/issues/7)
