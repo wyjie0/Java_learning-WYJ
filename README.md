@@ -27,4 +27,4 @@ public static int partition(int[] A, int p, int r) {
 }
 ```
 在一个样例数组上的partition操作过程如下：
-<img src="https://github.com/wyjie0/Algorithm/blob/master/img/quickSort1.png" width="200px">
+<img src="https://github.com/wyjie0/Algorithm/blob/master/img/quickSort.png" width="200px">
