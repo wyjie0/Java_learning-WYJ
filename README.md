@@ -5,4 +5,7 @@
 ## 排序算法（堆排序和快速排序）
 * [堆排序](https://github.com/wyjie0/Algorithm/issues/6)
 * [快速排序](https://github.com/wyjie0/Algorithm/issues/7)
+## 数据结构（二叉搜索树和红黑树）
+* [二叉搜索树](https://github.com/wyjie0/Algorithm/issues/8)
+* [红黑树](https://github.com/wyjie0/Algorithm/issues/9)
 
