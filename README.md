@@ -4,6 +4,6 @@
 #### [Algorithm](https://github.com/wyjie0/Algorithm/issues/9)
 #### [JVM]
 #### [Java并发编程]
-#### [设计模式]
+#### [设计模式](https://github.com/wyjie0/Algorithm/issues/12)
 
 
