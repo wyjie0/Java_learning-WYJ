@@ -218,3 +218,96 @@ Java虚拟机的即时编译器与C/C++的静态优化编译器相比，可能�
 不过Java语言的这些性能上的劣势都是为了换取开发效率上的优势而付出的代价。而且C/C++编译器所有优化都在编译期完成，以运行期性能监视为基础的优化它都无法完
 成。
 
+## 虚拟机类加载机制
+
+虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型，这就是虚拟机的类加载机制。在
+Java语言里，类型的加载、连接和初始化过程都是在程序运行期间完成的，这种策略会零类加载时增加性能开销，但是会为Java应用程序提供高度的灵活性，Java里动态
+扩展的语言特性就是依赖运行期动态加载和动态连接这个特点实现的。
+
+### 类加载的时机
+
+类加载的生命周期：加载、验证、准备、解析、初始化、使用和卸载。其中验证、准备、解析统称为连接。
+
+![image](https://user-images.githubusercontent.com/25001763/70872599-4f337b80-1fe4-11ea-80b2-89d750e54187.png)
+
+其中加载、验证、准备、初始化和卸载这5个阶段的顺U型是确定的，而解析阶段可能发生在初始化之后，这是为了支持Java语言的运行时绑定（动态绑定）。而且上述五
+个阶段通常都是互相交互地混合式进行的，通常会在一个阶段执行过程中调用、激活另外一个阶段。
+
+虚拟机规范严格规定有且仅有下列5中情况，必须立即对类进行“初始化”（加载、验证、准备在此之前开始）：
+
+1. 遇到new、getstatic、putstatic或invokestatic这4条字节码指令时，如果类没有进行过初始化，则需要先触发其初始化。Java代码场景：使用new关键字实例化
+对象的时候、读取或设置一个类的静态字段的时候（被final修饰、已在编译期把结果放入常量池的静态字段除外）、以及调用一个类的静态方法的时候。
+
+2. 使用java.lang.reflect包的方法对类进行反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化
+
+3. 当初始化一个类的时候，如果发现其父类还没有进行过初始化，则先触发其**父类**的初始化。而一个接口在初始化时，并不要求其父接口全部都完成了初始化，只有
+在真正使用到父接口的时候才会初始化。
+
+4. 当虚拟机启动时，用户需要指定一个执行的主类（包含main()方法的那个类），虚拟机会先初始化这个主类
+
+5. 当使用JDK 1.7 的动态语言支持时，如果一个java.lang.invoke.MethodHandle实例最后的解析结果为REF_getStatic、REF_putStatic、REF_invokeStatic的方
+法句柄，并且这个方法句柄所对应的类没有进行过初始化时，先触发其初始化
+
+这5种场景中的行为称为对一个类进行主动引用。除此之外，所有引用类的方式都不会触发初始化，称为被动引用。
+
+被动引用的例子：
+
+* 通过子类引用父类的静态字段，不会导致子类初始化
+```
+public class SuperClass {
+
+    static {
+        System.out.println("superclass init");
+    }
+    public static int value = 123;
+}
+
+public class SubClass extends SuperClass{
+
+    static {
+        System.out.println("subclass init");
+    }
+
+}
+
+public class NotInitialization {
+
+    public static void main(String[] args) {
+        System.out.println(SubClass.value);
+    }
+}
+```
+上述代码不会输出“subclass init”。对于静态字段，只有直接定义这个字段的类才会被初始化，因此通过子类来引用父类中定义的静态字段，只会触发父类的初始化而
+不会触发子类的初始化。
+
+* 通过数组定义来引用类，不会触发此类的初始化
+
+```
+public class NotInitialization {
+
+    public static void main(String[] args) {
+        SuperClass[] superClasses = new SuperClass[10];
+    }
+}
+```
+这段代码不会输出任何结果。
+
+* 常量在编译阶段会存入调用类的常量池中，本质上并没有直接引用到定义常量的类，因此不会触发定义常量的类的初始化
+```
+public class ConstClass {
+
+    static {
+        System.out.println("constclass init");
+    }
+
+    public final static int VALUE = 10;
+}
+
+public class NotInitialization {
+
+    public static void main(String[] args) {
+        System.out.println(ConstClass.VALUE);
+    }
+}
+```
+这段代码只会输出常量的值10，而不会输出“constclass init”。
