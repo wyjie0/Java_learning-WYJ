@@ -5,5 +5,7 @@
 #### [JVM](https://github.com/wyjie0/Java_learning-WYJ/blob/master/notes/JVM.md)
 #### [Java并发编程](https://github.com/wyjie0/Java_learning-WYJ/blob/master/notes/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B.md)
 #### [设计模式](https://github.com/wyjie0/Java_learning-WYJ/blob/master/notes/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md)
-
+#### [数据库]
+  * [MySQL]
+  * [Redis]
 
