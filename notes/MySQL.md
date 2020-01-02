@@ -53,3 +53,4 @@ ON
 
 # 一些好的文章
 [MySQL索引背后的数据结构及算法原理](http://blog.codinglabs.org/articles/theory-of-mysql-index.html)
+[数据库两大神器--索引和锁](https://juejin.im/post/5b55b842f265da0f9e589e79)
