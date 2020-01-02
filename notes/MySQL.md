@@ -52,5 +52,6 @@ ON
 数据库可能并不会完全按照逻辑查询处理的方式来进行查询。在MySQL数据库层有Parser和Optimizer两个组件。Parser的工作是分析SQL语句，Optimizer的工作是对SQL语句进行优化，选择一条最优的路径来选取数据，但是必须保证最终结果与逻辑查询处理是相等的。物理查询可以利用表上的索引来缩短SQL语句运行的时间，一次来提高数据库的整体性能。
 
 # 一些好的文章
-[MySQL索引背后的数据结构及算法原理](http://blog.codinglabs.org/articles/theory-of-mysql-index.html)
-[数据库两大神器--索引和锁](https://juejin.im/post/5b55b842f265da0f9e589e79)
+* [MySQL索引背后的数据结构及算法原理](http://blog.codinglabs.org/articles/theory-of-mysql-index.html)
+
+* [数据库两大神器--索引和锁](https://juejin.im/post/5b55b842f265da0f9e589e79)
